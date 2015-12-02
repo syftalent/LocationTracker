@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<script src="https://cdn.firebase.com/js/client/2.3.2/firebase.js"></script>
+<html>
+  <head>
+    <style type="text/css">
+      html, body { height: 100%; margin: 0; padding: 0; }
+      #map { height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      // Get a database reference to our posts
+      var ref = new Firebase("https://geolocationtracker.firebaseio.com/users/ray");
+
+      var map;
+      function initMap() {
+        var center = {lat: 38.894445, lng:  -77.066450};
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: center,
+          zoom: 12
+        });
+      }
+
+      // Attach an asynchronous callback to read the data at our posts reference
+      ref.on("value", function(snapshot) {
+        var data = snapshot.val();
+        addMarker(map,data);
+      }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+      });
+
+      function addMarker(map, user){
+          var coordinate = new Object();
+           coordinate.lat = user.lastknownlocation.lat;
+           coordinate.lng = user.lastknownlocation.lng;
+          var marker = new google.maps.Marker({
+          position: coordinate,
+          map: map,
+          title: 'Hello World!'
+        });
+      }
+
+
+
+
+    </script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLMj9u3U9365Aulw-vmOUHrZ24H3QOoWM&callback=initMap">
+    </script>
+  </body>
+</html>
