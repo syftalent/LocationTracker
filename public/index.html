@@ -11,7 +11,7 @@
     <div id="map"></div>
     <script type="text/javascript">
       // Get a database reference to our posts
-      var ref = new Firebase("https://geolocationtracker.firebaseio.com/users/ray");
+      var ref = new Firebase("https://geolocationtracker.firebaseio.com/users");
 
       var map;
       function initMap() {
@@ -25,7 +25,10 @@
       // Attach an asynchronous callback to read the data at our posts reference
       ref.on("value", function(snapshot) {
         var data = snapshot.val();
-        addMarker(map,data);
+        //addMarker(map,data.ray);
+        for(i in data){
+          addMarker(map,data[i]);
+        }
       }, function (errorObject) {
         console.log("The read failed: " + errorObject.code);
       });
