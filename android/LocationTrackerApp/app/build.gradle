@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.google.gms.google-services'
 
 def appBuildVersion = "0.1"
 def sdkBuildVersion = "0.1"
@@ -11,10 +12,12 @@ project.group = "yifei_shen"
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+        //classpath 'com.google.gms:google-services:1.5.0-beta2'
     }
 }
 
@@ -35,6 +38,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 repositories {
@@ -45,6 +53,5 @@ repositories {
 
 dependencies {
     compile (group:'yifei_shen', name:'LocationTrackerSDK', version:sdkBuildVersion + releaseType, ext:'aar',changing:true, transitive: true)
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.google.android.gms:play-services-maps:8.3.0'
 }

@@ -1,28 +1,29 @@
-package com.yifeishen.locationtrackerapp.Activity;
+package com.yifeishen.locationtrackerapp.UI.Activity;
 
+import android.content.Intent;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.yifeishen.locationtrackerapp.R;
 import com.yifeishen.locationtrackersdk.LT.LocationTracker;
 import com.yifeishen.locationtrackersdk.LT.LocationTrackerSDK;
 import com.yifeishen.locationtrackersdk.Sensor.LTLocationListener;
+import com.yifeishen.locationtrackersdk.ui.LoginActivity;
+import com.yifeishen.locationtrackersdk.user.UserManager;
 
 public class MapActivity extends FragmentActivity {
     private static String LOG_TAG = MapActivity.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationTrackerSDK mLTSDK;
+    private UserManager mUserManager;
 
     private boolean mCenterCamera = true;
     private boolean mFisrtTimeMoveCamera = true;
@@ -31,10 +32,17 @@ public class MapActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreate()!!!!!!!!!!!!!!!!!");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
         setUpMapIfNeeded();
         mLTSDK = LocationTracker.getSDK();
+        mUserManager = mLTSDK.getUserManager();
+        checkUserLogin();
+
+        Log.d(LOG_TAG,"start share location");
+        mLTSDK.startShareLocation();
         mLTSDK.startFetchLocation(new LTLocationListener() {
             @Override
             public void onConnectionFailuer(Exception e) {
@@ -59,6 +67,7 @@ public class MapActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(LOG_TAG, "onResume()!!!!!!!!!!!!!!!!!");
         setUpMapIfNeeded();
     }
 
@@ -119,5 +128,14 @@ public class MapActivity extends FragmentActivity {
         return super.dispatchTouchEvent(ev);
     }
 
-
+    private boolean checkUserLogin(){
+        Log.d(LOG_TAG, "checkUserLogin()");
+        if(mUserManager.getActiveUser() == null){
+            Intent registerIntent = new Intent(this, LoginActivity.class);
+            startActivity(registerIntent);
+            return false;
+        }else{
+            return true;
+        }
+    }
 }
