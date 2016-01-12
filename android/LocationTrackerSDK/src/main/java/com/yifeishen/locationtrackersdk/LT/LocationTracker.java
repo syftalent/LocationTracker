@@ -19,6 +19,7 @@ public class LocationTracker {
         if(sSDKConfiguration != null){
             if(sLocationTrackerSDK == null) {
                 sLocationTrackerSDK = new LocationTrackerSDKImpl(sSDKConfiguration);
+                sLocationTrackerSDK.init();
             }
         }else{
             Log.w(LOG_TAG, "unable to create sdk, need to set the configuration first");

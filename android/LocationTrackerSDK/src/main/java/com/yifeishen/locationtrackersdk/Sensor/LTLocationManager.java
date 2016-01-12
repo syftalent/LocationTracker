@@ -13,6 +13,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.yifeishen.locationtrackersdk.Utils.Utils;
+import com.yifeishen.locationtrackersdk.cloud.FirebaseManager;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,10 +30,14 @@ public class LTLocationManager implements ConnectionCallbacks, OnConnectionFaile
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private boolean mRequestLocationUpdate;
+    private boolean mShareLocation;
+    private FirebaseManager mFirebaseManager;
+    private Context mContext;
 
     private static LTLocationManager mInstance;
 
     public LTLocationManager(Context context){
+        mContext = context;
         listenerSet = new HashSet<LTLocationListener>();
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API)
@@ -73,6 +78,21 @@ public class LTLocationManager implements ConnectionCallbacks, OnConnectionFaile
         }
     }
 
+    public void startShareLocation(){
+        mShareLocation = true;
+    }
+
+    public void stopShareLocation(){
+        mShareLocation = false;
+    }
+
+    private void shareLocation(Location location){
+        if(mFirebaseManager == null){
+            mFirebaseManager = FirebaseManager.getInstance(mContext);
+        }
+        mFirebaseManager.updateLocation(location);
+    }
+
     private void informOnLocationChanged(Location location){
         synchronized (listenerSet){
             Iterator<LTLocationListener> iterator = listenerSet.iterator();
@@ -107,12 +127,18 @@ public class LTLocationManager implements ConnectionCallbacks, OnConnectionFaile
         Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(Utils.isValidLocation(lastKnownLocation)){
             informOnLocationChanged(lastKnownLocation);
+            if(mShareLocation){
+                shareLocation(lastKnownLocation);
+            }
         }
 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 informOnLocationChanged(location);
+                if(mShareLocation){
+                    shareLocation(location);
+                }
             }
         });
     }

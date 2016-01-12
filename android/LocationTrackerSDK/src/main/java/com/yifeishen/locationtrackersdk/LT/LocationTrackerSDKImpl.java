@@ -2,8 +2,11 @@ package com.yifeishen.locationtrackersdk.LT;
 
 import android.content.Context;
 
+import com.firebase.client.Firebase;
 import com.yifeishen.locationtrackersdk.Sensor.LTLocationListener;
 import com.yifeishen.locationtrackersdk.Sensor.LTLocationManager;
+import com.yifeishen.locationtrackersdk.user.UserManager;
+import com.yifeishen.locationtrackersdk.user.UserManagerImpl;
 
 /**
  * Created by Flyaway on 12/6/15.
@@ -29,6 +32,10 @@ public class LocationTrackerSDKImpl implements LocationTrackerSDK {
 
     @Override
     public void init() {
+        if(mInitialized){
+            return;
+        }
+        UserManagerImpl.initUserManager(mContext);
         mLocationManager = new LTLocationManager(mContext);
         mInitialized = true;
     }
@@ -52,10 +59,17 @@ public class LocationTrackerSDKImpl implements LocationTrackerSDK {
     @Override
     public void startShareLocation() {
         mShareLocation = true;
+        mLocationManager.startShareLocation();
     }
 
     @Override
     public void stopShareLocation() {
         mShareLocation = false;
+        mLocationManager.stopShareLocation();
+    }
+
+    @Override
+    public UserManager getUserManager() {
+        return UserManagerImpl.getInstance();
     }
 }
