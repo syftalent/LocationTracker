@@ -32,15 +32,23 @@ public class MapActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreate()!!!!!!!!!!!!!!!!!");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        setUpMapIfNeeded();
         mLTSDK = LocationTracker.getSDK();
         mUserManager = mLTSDK.getUserManager();
-        checkUserLogin();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(checkUserLogin()){
+            startFetchLocation();
+            setUpMapIfNeeded();
+        }
+    }
+
+    private void startFetchLocation(){
         Log.d(LOG_TAG,"start share location");
         mLTSDK.startShareLocation();
         mLTSDK.startFetchLocation(new LTLocationListener() {
@@ -62,17 +70,6 @@ public class MapActivity extends FragmentActivity {
                 }
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume()!!!!!!!!!!!!!!!!!");
-        setUpMapIfNeeded();
-    }
-
-    private void init(){
-
     }
 
     /**
@@ -135,6 +132,7 @@ public class MapActivity extends FragmentActivity {
             startActivity(registerIntent);
             return false;
         }else{
+            Log.i(LOG_TAG, "Active User: " + mUserManager.getActiveUser().getEmail());
             return true;
         }
     }

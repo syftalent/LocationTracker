@@ -12,7 +12,7 @@ import java.util.Map;
 public interface UserManager {
     public User getActiveUser();
 
-    public boolean setActiveUser(User user);
+    public void setActiveUser(User user);
 
     public boolean logoutUser();
 

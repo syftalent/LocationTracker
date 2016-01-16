@@ -1,6 +1,9 @@
 package com.yifeishen.locationtrackersdk.user;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.Preference;
+import android.util.Log;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -16,6 +19,8 @@ import java.util.Map;
  * Created by Flyaway on 1/11/16.
  */
 public class UserManagerImpl implements UserManager {
+    private final String LOG_TAG = UserManagerImpl.class.getSimpleName();
+
     private static UserManagerImpl mInstance;
     private static Context mContext;
 
@@ -34,13 +39,12 @@ public class UserManagerImpl implements UserManager {
 
     @Override
     public User getActiveUser() {
-        return null;
+        return mActiveUser;
     }
 
     @Override
-    public boolean setActiveUser(User user) {
+    public void setActiveUser(User user) {
         mActiveUser = user;
-        return true;
     }
 
     @Override
@@ -58,7 +62,8 @@ public class UserManagerImpl implements UserManager {
         mFirebaseManager.loginUser(email, pwd, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
-                setActiveUser(new User(authData.getProviderData().get("email").toString(), authData.getUid()));
+                User newUser = new User(authData.getProviderData().get("email").toString(), authData.getUid());
+                setActiveUser(newUser);
                 handler.onSuccess(authData);
             }
 
@@ -71,7 +76,8 @@ public class UserManagerImpl implements UserManager {
 
     public static UserManagerImpl getInstance() {
         if (mInstance == null) {
-            return new UserManagerImpl();
+            mInstance = new UserManagerImpl();
+            return mInstance;
         } else {
             return mInstance;
         }
